@@ -1,0 +1,12 @@
+broker.id=2
+listeners=PLAINTEXT://172.31.32.168:9092
+advertised.listeners=PLAINTEXT://172.31.32.168:9092
+log.dirs=/opt/kafka/logs
+zookeeper.connect=172.31.32.65:2181,172.31.32.168:2181
+num.partitions=2
+default.replication.factor=2
+min.insync.replicas=2
+auto.create.topics.enable=true
+log.retention.hours=168
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000

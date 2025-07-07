@@ -1,0 +1,25 @@
+FROM openjdk:8-jre
+
+WORKDIR /opt
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y wget && \
+    rm -rf /var/lib/apt/lists/*
+RUN echo "172.31.32.127 kafka1" >> /etc/hosts
+RUN echo "172.31.32.34 kafka1" >> /etc/hosts
+
+
+# Download and install Zookeeper
+RUN wget https://dlcdn.apache.org/zookeeper/zookeeper-3.9.3/apache-zookeeper-3.9.3-bin.tar.gz && \
+    tar -xvzf apache-zookeeper-3.9.3-bin.tar.gz && \
+    mv apache-zookeeper-3.9.3-bin /opt/zookeeper && \
+    mkdir -p /opt/zookeeper/data && \
+    echo 2 > /opt/zookeeper/data/myid
+    # Set myid for Zookeeper it changes based on the instance
+
+# Copy zoo.cfg
+COPY zoo.cfg /opt/zookeeper/conf/zoo.cfg
+
+EXPOSE 2181 2888 3888
+
+ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh", "start-foreground"]

@@ -1,0 +1,23 @@
+# kafka Dockerfile
+# This Dockerfile sets up a Kafka server using OpenJDK 8 and Apache Kafka
+
+FROM openjdk:8-jre
+
+
+WORKDIR /opt
+
+RUN apt-get update && \
+    apt-get install -y wget && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget https://archive.apache.org/dist/kafka/1.1.1/kafka_2.12-1.1.1.tgz && \
+    tar -xvzf kafka_2.12-1.1.1.tgz && \
+    mv kafka_2.12-1.1.1 /opt/kafka
+
+RUN mv /opt/kafka/config/server.properties /opt/kafka/config/server.properties.backup
+
+COPY server.properties /opt/kafka/config/
+
+EXPOSE 9092
+
+CMD ["/opt/kafka/bin/kafka-server-start.sh", "/opt/kafka/config/server.properties"]

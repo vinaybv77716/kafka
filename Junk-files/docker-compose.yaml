@@ -1,0 +1,31 @@
+# Not Ready
+
+version: '3.8'
+
+services:
+
+  zookeeper:
+    image: zk-custom   # build from Dockerfile-zk1 or Dockerfile-zk2 as appropriate
+    container_name: zookeeper
+    network_mode: host
+    restart: always
+    environment:
+      ZOO_MY_ID: 1      # override to 2 on second node
+    volumes:
+      - /opt/zookeeper/data:/opt/zookeeper/data
+    command: /opt/zookeeper/bin/zkServer.sh start-foreground
+
+  kafka:
+    image: kafka-custom  # build from Dockerfile-kafka1 or Dockerfile-kafka2
+    container_name: kafka
+    network_mode: host
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1       # override to 2 on second node
+      KAFKA_ZOOKEEPER_CONNECT: 172.31.32.65:2181,172.31.32.168:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.31.32.65:9092  # change to second node's IP on node 2
+    volumes:
+      - /opt/kafka/logs:/opt/kafka/logs
+    command: /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
