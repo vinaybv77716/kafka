@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    build:
+      context: ./zookeeper
+      dockerfile: Dockerfile
+    network_mode: host
+    container_name: zookeeper
+
+  kafka:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile
+    network_mode: host
+    depends_on:
+      - zookeeper
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://a.skyclouds.live:9092

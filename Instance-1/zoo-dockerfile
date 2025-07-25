@@ -1,0 +1,36 @@
+FROM eclipse-temurin:8-jre-jammy
+
+# Set working directory
+WORKDIR /opt
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y wget vim && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download and install ZooKeeper
+RUN wget https://dlcdn.apache.org/zookeeper/zookeeper-3.9.3/apache-zookeeper-3.9.3-bin.tar.gz && \
+    tar -xvzf apache-zookeeper-3.9.3-bin.tar.gz && \
+    mv apache-zookeeper-3.9.3-bin /opt/zookeeper
+
+# Create ZooKeeper data dir and myid
+RUN mkdir -p /opt/zookeeper/data && \
+    chmod 755 /opt/zookeeper/data && \
+    echo 1 > /opt/zookeeper/data/myid && \
+    chmod 644 /opt/zookeeper/data/myid
+
+# Create zoo.cfg
+RUN mkdir -p /opt/zookeeper/conf && \
+    echo "tickTime=2000" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "dataDir=/opt/zookeeper/data" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "clientPort=2181" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "initLimit=10" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "syncLimit=5" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "maxClientCnxns=0" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "admin.enableServer=false" >> /opt/zookeeper/conf/zoo.cfg && \
+    echo "server.1=a.skyclouds.live:2888:3888" >> /opt/zookeeper/conf/zoo.cfg  
+  
+EXPOSE 2181 2888 3888
+
+# Start ZooKeeper
+ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh", "start-foreground"]

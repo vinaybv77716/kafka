@@ -1,9 +1,9 @@
-FROM openjdk:8-jre
+FROM eclipse-temurin:8-jre-jammy
 
 WORKDIR /opt
 
 RUN apt-get update && \
-    apt-get install -y wget && \
+    apt-get install -y wget vim && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://archive.apache.org/dist/kafka/1.1.1/kafka_2.12-1.1.1.tgz && \

@@ -1,8 +1,8 @@
 How to use
 
 In 1st instance
-docker build -f Dockerfile-zookeeper-1 -t zookeeper-image-1:latest .
-docker build -f Dockerfile-kafka-1 -t kafka1-image-2:latest .
+docker build -t Dockerfile-zookeeper-1 -t zookeeper-image-1:latest .
+docker build -t Dockerfile-kafka-1 -t kafka1-image-2:latest .
 
 docker run -d --name zookeeper1 --network host zookeeper-image-1:latest
 docker run -d --name kafka1 --network host kafka1-image-2:latest
@@ -10,8 +10,8 @@ docker run -d --name kafka1 --network host kafka1-image-2:latest
 
 
 In 2nd instance
-docker build -f Dockerfile-zookeeper-2 -t zookeeper-image-2:latest .
-docker build -f Dockerfile-kafka-2 -t kafka1-image-2:latest .
+docker build -t Dockerfile-zookeeper-2 -t zookeeper-image-2:latest .
+docker build -t Dockerfile-kafka-2 -t kafka1-image-2:latest .
 
 docker run -d --name zookeeper2 --network host zookeeper-image-2:latest
 docker run -d --name kafka2 --network host kafka1-image-2:latest 
@@ -20,13 +20,14 @@ docker run -d --name kafka2 --network host kafka1-image-2:latest
 
 docker run -dit --network host --name zookeeper ubuntu sleep infinity
 docker run -dit --network host  --name zookeeper openjdk:8-jre sleep infinity
+docker run -dit --network host  --name kafka openjdk:8-jre sleep infinity
 
 
 172.31.32.34
 
 
-echo "172.31.32.127 kafka1" >> /etc/hosts
-echo "172.31.8.34 kafka1" >> /etc/hosts
+echo "172.31.32.189 kafka1" >> /etc/hosts
+echo "172.31.32.149 kafka1" >> /etc/hosts
 
 apt update -y &&  apt install openjdk-21-jdk -y # need to enter 5 and 44 for geo and time zone location
 
@@ -38,7 +39,7 @@ mv apache-zookeeper-3.9.3-bin /opt/zookeeper
 
  mkdir -p /opt/zookeeper/data
  chmod 755 /opt/zookeeper/data
- echo 2 > /opt/zookeeper/data/myid 
+ echo 1 > /opt/zookeeper/data/myid 
  chmod 644 /opt/zookeeper/data/myid
 
 
@@ -49,9 +50,9 @@ clientPort=2181
 initLimit=10
 syncLimit=5
 maxClientCnxns=0
-admin.enableServer=false  
-server.1=172.31.32.127:2888:3888
-server.2=172.31.32.115:2888:3888
+admin.enableServer=false
+server.1=172.31.32.57:2888:3888
+server.2=172.31.32.39:2888:3888
 EOF
 
 
@@ -88,17 +89,16 @@ ls /opt/kafka/config/
 
 cat <<EOF > /opt/kafka/config/server.properties
 broker.id=1
-listeners=PLAINTEXT://172.31.32.127:9092     
-advertised.listeners=PLAINTEXT://172.31.32.127:9092  
+listeners=PLAINTEXT://a.skyclouds.live:9092
+advertised.listeners=PLAINTEXT://a.skyclouds.live:9092
 log.dirs=/opt/kafka/logs
-zookeeper.connect=172.31.32.127:2181,172.31.8.34:2181 
+zookeeper.connect=a.skyclouds.live:2181,b.skyclouds.live:2181,c.skyclouds.live:2181
 num.partitions=2
 default.replication.factor=2
 min.insync.replicas=2
 auto.create.topics.enable=true
 log.retention.hours=168
 log.segment.bytes=1073741824
-log.retention.check.interval.ms=300000
 EOF
 
 /opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties
